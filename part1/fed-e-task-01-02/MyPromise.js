@@ -1,6 +1,5 @@
-/*
-尽可能还原 Promise 中的每一个 API, 并通过注释的方式描述思路和原理.
-*/
+const { reject } = require("lodash")
+
 /**
  * 1. Promise 是个类，在执行的时候 需要传递一个执行去进去，执行器会立即执行
  * 2. Promise有三个状态  pending  fulfilled rejected
@@ -54,7 +53,6 @@ class MyPromise {
   then(successCallBack, failCallBack) {
     successCallBack = successCallBack? successCallBack : (value) => value
     failCallBack = failCallBack? failCallBack : (reason) => { throw reason }
-    // 当promise 链式调用 then 方法时 返回promise 对象， 那么我们就要创建一个 promise 对象， 并返回
     let promise1 = new MyPromise((resolve, reject) => {
       if(this.status === FULFILLED) {
         // promise1 不能获取到，执行器首先执行，并不能获取到pormise1，添加个settimeout宏任务，取保能获取到promise1

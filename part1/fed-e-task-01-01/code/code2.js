@@ -49,7 +49,8 @@ const cars = [{
 */
 
 // 1.实现 isLastInStock 函数
-
+const isLastInStock = fp.flowRight(fp.prop('in_stock'), fp.last);
+// console.log(isLastInStock(cars))
 // 2.打印测试
 console.log( isLastInStock(cars) )  // 最终返回 true
 
@@ -59,7 +60,7 @@ console.log( isLastInStock(cars) )  // 最终返回 true
   把 fp.prop(), fp.first() 组合而成
 */
 // 1.实现 firstName 函数
-
+const firstName = fp.flowRight(fp.prop('name'), fp.first)
 // 2.打印测试
 console.log( firstName(cars) )  // 最终返回 Ferrari FF (第一个 car 的 name) 
 
@@ -82,20 +83,31 @@ console.log( firstName(cars) )  // 最终返回 Ferrari FF (第一个 car 的 na
   } // <- 无须改动
   
   // 1.实现 averageDollarValue 函数
-  
+  const averageDollarValue = fp.flowRight(_average, fp.map(car => {
+    return car.dollar_value;
+  }));
   // 2.打印测试
-  console.log( averageDollarValue(cars) )  // 最终返回 
+  console.log( averageDollarValue(cars) )  // 最终返回 790700
 
-/*
-  练习4: 
-  实现 sanitizeNames() 函数，要求使用 fp.flowRight()
-  把 返回一个下划线连接的小写字符串，
-  把数组中的 name 转换为这种形式： 例如：sanitizeNames(["Hello World"]) => ["hello_world"]
-*/
-// 把非字母数字替换为下划线
+// /*
+//   练习4: 
+//   实现 sanitizeNames() 函数，要求使用 fp.flowRight()
+//   把 返回一个下划线连接的小写字符串，
+//   把数组中的 name 转换为这种形式： 例如：sanitizeNames(["Hello World"]) => ["hello_world"]
+// */
+// // 把非字母数字替换为下划线
 let _underscore = fp.replace(/\W+/g, '_') // <--无须改动
 
-// 1.实现 sanitizeNames 函数
-
-// 2.打印测试
+// // 1.实现 sanitizeNames 函数
+const sanitizeNames = fp.map(fp.flowRight(_underscore, fp.lowerCase, car => car.name));
+// // 2.打印测试
 console.log( sanitizeNames(cars) )
+
+// [
+//   'ferrari_ff',
+//   'spyker_c_12_zagato',
+//   'jaguar_xkr_s',
+//   'audi_r_8',
+//   'aston_martin_one_7',
+//   'pagani_huayara'
+// ]

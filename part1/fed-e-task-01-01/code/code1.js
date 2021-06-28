@@ -13,3 +13,13 @@
   }, 10)
 */
 
+var promise = data => new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve(data)
+  }, 10)
+})
+promise('hello').then(a => {
+  return promise('lagou').then(b => a + b)
+}).then((c)=> {
+  return promise('I ♥ U').then(d => c + d)
+}).then(e => { console.log(e) })
