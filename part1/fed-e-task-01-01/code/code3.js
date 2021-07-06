@@ -12,9 +12,9 @@ const { Maybe, Container } = require('./support')
 let maybe = Maybe.of([5, 6, 1])
 console.log(maybe)
 // 2.实现 ex1 函数
-const ex1 = () => maybe.map(fp.map(fp.add(1)))
+let ex1 = () => maybe.map(i => fp.map(fp.add(1), i))
 // 3.调用测试
-console.log( maybe.map(ex1) )  // Maybe { _value: [ 6, 7, 2 ] }
+console.log( ex1() )  // Maybe { _value: [ 6, 7, 2 ] }
 
 
 /*
