@@ -9,8 +9,29 @@
 　
 
 #### 2、Loader 和 Plugin 有哪些不同？请描述一下开发 Loader 和 Plugin 的思路。
-
+#### Loader
+* 使用test正则匹配一定的规则
+* loader是文件加载器，负责文件从输入到输出的转换
+* 对于同个文件用多个loader，从后往前执行，把处理好的内容交给下一个loader
+* loader可以再options配置参数
 　
+#### Plugin
+* Plugin是个 class， 是webpack的扩展
+* 根据打包的生命周期，触发钩子函数
+* Plugin在loader执行完成，在生命周期中触发钩子函数，扩展一些功能
+
+#### Loader开发思路
+* 安装loader-utils
+* 通过getOptions获取参数
+* 根据source资源进行操作
+* 将处理过后的值调用 return `export default ${ result }` or this.callback(null, result)
+
+#### Plugin开发思路
+* 插件名称 class
+* 插件上的 apply( compiler ) 方法
+* 调用compiler.hooks.done.tap('PluginName', (stats) => {
+*		// 插件处理逻辑
+* })
 
 　
 

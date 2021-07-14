@@ -140,8 +140,437 @@ module.exports = (route) => {
 (html,css,等素材已经放到code/pages-boilerplate目录)
 
 　
+## 创建Glup自动化构建
+### 准备工作
+* 安装grup
+```js
+  yarn add grup --dev
+```
+* 项目根目录创建 gulpfile.js 文件
+### 编译scss
+```js
+  const { src, dest } = require('gulp')
 
-　
+  const style = () => {
+    return src('src/assets/styles/*.scss').pipe(dest('dist'))
+  }
+
+  module.exports = {
+    style
+  }
+```
+
+![avatar](image/image.png)
+
+
+* 根目录下会多出dist目录，scss文件路径不匹配, 设置base为 src
+```js
+  const { src, dest } = require('gulp')
+
+  const style = () => {
+    return src('src/assets/styles/*.scss', { base: 'src' }).pipe(dest('dist'))
+  }
+
+  module.exports = {
+    style
+  }
+```
+
+![avatar](image/image-1.png)
+
+* 文件目录是正确的的，dist上一次的文件没有被清空，后面添加del就可以了
+* 对scss进行编译
+* yarn 安装gulp-sass
+
+
+```js
+  const { src, dest } = require('gulp')
+  const sass = require('gulp-sass')
+  const style = () => {
+    return src('src/assets/styles/*.scss', { base: 'src' })
+      .pipe(sass())
+      .pipe(dest('dist'))
+  }
+
+  module.exports = {
+    style
+  }
+```
+* yarn gulp style
+* 只有一个main.css，有下划线会认为是依赖文件，不会生成单独文件
+![avatar](image/image-2.png)
+### script 编译
+* yarn add gulp-babel @babel/core @babel/preset-env --dev
+```js
+  const babel = require('gulp-babel')
+
+  const script = () => {
+    return src('src/assets/scripts/*.js', { base: 'src' })
+      .pipe(babel({
+        presets: ['@babel/preset-env']
+      }))
+      .pipe(dest('dist'))
+  }
+```
+### 页面模板编译
+* yarn add gulp-swig --dev
+```js
+  const page = () => {
+    return src('src/*.html', { base: 'src' })
+      .pipe(swig())
+      .pipe(dest('dist'))
+  }
+```
+
+### 创建组合任务
+```js
+  const { parallel } = require('gulp')
+  // 创建组合任务
+  const compile = parallel(style, script, page)
+
+  module.exports = {
+    compile
+  }
+```
+
+### 压缩图片与字体
+* yarn add gulp-imagemin --dev
+```js
+// 压缩图片，无损压缩，删除图片的原始信息
+const image = () => {
+  return src('src/assets/images/**', { base: 'src' })
+    .pipe(imagemin())
+    .pipe(dest('dist'))
+}
+
+const font = () => {
+  return src('src/assets/fonts/**', { base: 'src' })
+    .pipe(imagemin())
+    .pipe(dest('dist'))
+}
+```
+### 额外的copy任务与组合build命令
+```js
+const extra = () => {
+  return src('public/**', { base: 'public' })
+    .pipe(dest('dist'))
+}
+
+const compile = parallel(style, script, page, image, font)
+const build = parallel(compile, extra)
+
+module.exports = {
+  build
+}
+```
+### 创建clean任务
+* yarn add del --dev
+```js
+const { series } = require('gulp')
+const del = require('del')
+
+const clean = () => {
+  return del(['dist'])
+}
+// clean之后进行操作
+const build = series(clean, parallel(compile, extra))
+
+module.exports = {
+  build,
+  clean
+}
+```
+### 自动加载插件
+* yarn add gglup-load-plugins
+```js
+  const { src, dest, parallel, series } = require('gulp')
+  const loadPlugins = require('gulp-load-plugins')
+  const plugins = loadPlugins()
+
+  // const plugins.sass = require('gulp-sass')
+  // const plugins.babel = require('gulp-babel')
+  // const plugins.swig = require('gulp-swig')
+  // const plugins.imagemin = require('gulp-imagemin')
+  // const plugins.del = require('del')
+
+
+  const data = {
+    menus: [
+      {
+        name: 'Home',
+        icon: 'aperture',
+        link: 'index.html'
+      },
+      {
+        name: 'Features',
+        link: 'features.html'
+      },
+      {
+        name: 'About',
+        link: 'about.html'
+      },
+      {
+        name: 'Contact',
+        link: '#',
+        children: [
+          {
+            name: 'Twitter',
+            link: 'https://twitter.com/w_zce'
+          },
+          {
+            name: 'About',
+            link: 'https://weibo.com/zceme'
+          },
+          {
+            name: 'divider'
+          },
+          {
+            name: 'About',
+            link: 'https://github.com/zce'
+          }
+        ]
+      }
+    ],
+    pkg: require('./package.json'),
+    date: new Date()
+  }
+
+  const style = () => {
+    return src('src/assets/styles/*.scss', { base: 'src' })
+      .pipe(plugins.sass({ outputStyle: 'expanded' }))
+      .pipe(dest('dist'))
+  }
+
+  const script = () => {
+    return src('src/assets/scripts/*.js', { base: 'src' })
+      .pipe(plugins.babel({
+        presets: ['@babel/preset-env']
+      }))
+      .pipe(dest('dist'))
+  }
+
+  const page = () => {
+    return src('src/*.html', { base: 'src' })
+      .pipe(plugins.swig({ data }))
+      .pipe(dest('dist'))
+  }
+
+  const image = () => {
+    return src('src/assets/images/**', { base: 'src' })
+      .pipe(plugins.imagemin())
+      .pipe(dest('dist'))
+  }
+
+  const font = () => {
+    return src('src/assets/fonts/**', { base: 'src' })
+      .pipe(plugins.imagemin())
+      .pipe(dest('dist'))
+  }
+
+  const extra = () => {
+    return src('public/**', { base: 'public' })
+      .pipe(dest('dist'))
+  }
+  // 创建组合任务
+  const compile = parallel(style, script, page, image, font)
+
+  const clean = () => {
+    return plugins.del(['dist'])
+  }
+
+  const build = series(clean, parallel(compile, extra))
+
+  module.exports = {
+    build
+  }
+```
+### 开发服务器
+* yarn add browser-sync --dev
+```js
+  const bs = require('browser-sync')
+
+  const serve = () => {
+    watch('src/assets/styles/*.scss', style)
+    watch('src/assets/scripts/*.js', script)
+    watch('src/*.html', page)
+    watch('src/assets/images/**', image)
+    watch('src/assets/fonts/**', font)
+    watch('public', extra)
+    
+    bs.init({
+      port: '9000',
+      notify: false,
+      files: 'dist/*',
+      server: {
+        baseDir: 'dist',
+        routes: {'/node_modules': 'node_modules'}
+      }
+    })
+  }
+```
+### 文件压缩
+* yarn add gulp-htmlmin gulp-uglify gulp-clean-css --dev
+* yarn add gulp-if --dev
+```js
+  const useref = () => {
+  return src('dist/*.html')
+    .pipe(plugins.useref({ searchPath: ['dist', '.'] }))
+    // 文件压缩
+    .pipe(plugins.if(/\.js$/, plugins.uglify()))
+    .pipe(plugins.if(/\.css$/, plugins.cleanCss()))
+    .pipe(plugins.if(/\.html$/, plugins.htmlmin({ collapseWhitespace: true, minifyCSS: true, minifyJS: true })))
+    .pipe(dest('release'))
+}
+```
+### uesref 文件引入处理
+* yarn add gulp-useref --dev
+* page script style会先compile一个临时temp目录
+* build 过程先执行compile 在执行 useref series(compile, useref)
+
+```js
+
+const { src, dest, parallel, series, watch } = require('gulp')
+// const watch = require("gulp-watch");
+const loadPlugins = require('gulp-load-plugins')
+const plugins = loadPlugins()
+
+const bs = require('browser-sync').create()
+const sass = require('gulp-sass')
+// const plugins.babel = require('gulp-babel')
+// const plugins.swig = require('gulp-swig')
+// const plugins.imagemin = require('gulp-imagemin')
+const del = require('del')
+
+
+const data = {
+  menus: [
+    {
+      name: 'Home',
+      icon: 'aperture',
+      link: 'index.html'
+    },
+    {
+      name: 'Features',
+      link: 'features.html'
+    },
+    {
+      name: 'About',
+      link: 'about.html'
+    },
+    {
+      name: 'Contact',
+      link: '#',
+      children: [
+        {
+          name: 'Twitter',
+          link: 'https://twitter.com/w_zce'
+        },
+        {
+          name: 'About',
+          link: 'https://weibo.com/zceme'
+        },
+        {
+          name: 'divider'
+        },
+        {
+          name: 'About',
+          link: 'https://github.com/zce'
+        }
+      ]
+    }
+  ],
+  pkg: require('./package.json'),
+  date: new Date()
+}
+
+const style = () => {
+  return src('src/assets/styles/*.scss', { base: 'src' })
+    .pipe(sass({ outputStyle: 'expanded' }))
+    .pipe(dest('temp'))
+    .pipe(bs.reload({ stream: true }))
+}
+
+const script = () => {
+  return src('src/assets/scripts/*.js', { base: 'src' })
+    .pipe(plugins.babel({
+      presets: ['@babel/preset-env']
+    }))
+    .pipe(dest('temp'))
+    .pipe(bs.reload({ stream: true }))
+}
+
+const page = () => {
+  return src('src/*.html', { base: 'src' })
+    .pipe(plugins.swig({ data }))
+    .pipe(dest('temp'))
+    .pipe(bs.reload({ stream: true }))
+}
+
+const image = () => {
+  return src('src/assets/images/**', { base: 'src' })
+    .pipe(plugins.imagemin())
+    .pipe(dest('dist'))
+}
+
+const font = () => {
+  return src('src/assets/fonts/**', { base: 'src' })
+    .pipe(plugins.imagemin())
+    .pipe(dest('dist'))
+}
+
+const extra = () => {
+  return src('public/**', { base: 'public' })
+    .pipe(dest('dist'))
+}
+
+
+const clean = () => {
+  return del(['dist', 'temp'])
+}
+const serve = () => {
+  watch('src/assets/styles/*.scss', style)
+  watch('src/assets/scripts/*.js', script)
+  watch('src/*.html', page)
+  watch(['src/assets/fonts/**','src/assets/images/**'],bs.reload)
+  // watch('src/assets/images/**', image)
+  // watch('src/assets/fonts/**', font)
+  // watch('public', extra)
+
+  bs.init({
+    port: '9000',
+    notify: false,
+    // files: 'dist',
+    server: {
+      baseDir: ['temp', 'src', 'public'],
+      routes: {'/node_modules': 'node_modules'}
+    }
+  })
+}
+
+const useref = () => {
+  return src('temp/*.html')
+    .pipe(plugins.useref({ searchPath: ['temp', '.'] }))
+    // 文件压缩
+    .pipe(plugins.if(/\.js$/, plugins.uglify()))
+    .pipe(plugins.if(/\.css$/, plugins.cleanCss()))
+    .pipe(plugins.if(/\.html$/, plugins.htmlmin({ collapseWhitespace: true, minifyCSS: true, minifyJS: true })))
+    .pipe(dest('dist'))
+}
+
+
+// 创建组合任务
+const compile = parallel(style, script, page)
+const build = series(clean, parallel(series(compile, useref), image, font, extra))
+const develop = series(compile, serve)
+module.exports = {
+  clean,
+  build,
+  develop
+}
+
+```
+
+![项目地址](image/WechatIMG46.png)
 
 ## 说明：
 
