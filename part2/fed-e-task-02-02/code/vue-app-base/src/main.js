@@ -1,10 +1,7 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
-
 import './style.less'
+createApp(App).mount('#app')
 
-Vue.config.productionTip = false
 
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+console.log(process)
