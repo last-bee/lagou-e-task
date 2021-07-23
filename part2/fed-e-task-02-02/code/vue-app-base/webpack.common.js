@@ -47,7 +47,8 @@ module.exports = {
         removeComments: true, //去注释
         collapseWhitespace: true, //压缩空格
         removeAttributeQuotes: true //去除属性引用
-      }
+      },
+      favicon: path.resolve(__dirname, 'public', 'favicon.ico')
     }),
     new VueLoaderPlugin()
   ]

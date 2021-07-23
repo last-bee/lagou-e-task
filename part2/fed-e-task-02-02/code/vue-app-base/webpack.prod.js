@@ -6,6 +6,8 @@ const path = require('path')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
 process.env.NODE_ENV = 'production'
 
 
@@ -18,13 +20,13 @@ module.exports = merge(common, {
       new TerserWebpackPlugin()
     ],
     splitChunks: {
-      cacheGroups: {
-        commons: {
-          test: /(vue)/,
-          name: 'vue.min.js',
-          chunks: 'all'
-        }
-      },
+      // cacheGroups: {
+      //   commons: {
+      //     test: /(vue)/,
+      //     name: 'vue.min.js',
+      //     chunks: 'all'
+      //   }
+      // },
       chunks: 'all',//所有的库分离 //async 异步库进行分离（默认）  initial 同步库进行分离
       minSize: 10000, //最小值体积（bt）
       maxSize: 0,
@@ -48,12 +50,18 @@ module.exports = merge(common, {
     ]
   },
   plugins: [
+    new CleanWebpackPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "./src/assets", to: "./assets" },
+        // { from: "./public/favicon.ico", to: "./" },
+      ],
+    }),
     new MiniCssExtractPlugin({
       filename: "css/[name].[contenthash:8].css"
     }),
-    new CleanWebpackPlugin(),
     new DefinePlugin({
-      BASE_URL: "/public/",
+      BASE_URL: "'./'",
       process: JSON.stringify(
         { 
           env: {
