@@ -2,6 +2,59 @@
 
 #### 使用 NuxtJS 实现 RealWorld 全部功能
 
+## 项目 github 仓库地址↓(https://github.com/last-bee/realworld-nuxt)
+
+[github链接](https://github.com/last-bee/realworld-nuxt)
+
+## 项目 demo 地址↓(http://realworld.lastbee.cn/)
+[项目 demo 链接](http://realworld.lastbee.cn/)
+
+---
+
+## 项目总结
+### 路由配置
+* 默认方式是pages里面对应路由，项目中不常用，记着几个知识点
+  * pages name 就是路由名，文件夹内为子路由，_开头为动态路由。
+* nuxt.config.js 可以配置router, 方法extendRoutes（router, resolve）,添加方式push到router，写法与vue-router一样，（是不是支持props传递动态参数没有试一下）
+* 路由导航<router-link><nuxt-link>用法一样
+* 编程式导航用法一样
+* 路由嵌套 <nuxt-child>
+* nuxt定制模板
+```js
+  <!DOCTYPE html>
+  <html {{ HTML_ATTRS }}>
+    <head {{ HEAD_ATTRS }}>
+      {{ HEAD }}
+    </head>
+    <body {{ BODY_ATTRS }}>
+      {{ APP }}
+    </body>
+  </html>
+```
+* 插件plugins
+  * '~/plugins/request.js'
+  * 能获取到context
+  * 如store,router...
+* vuex
+  * 创建store/index.js
+  * 直接导出 state(function), mutations, actions
+* 异步数据
+  * asyncData方法
+  * 组件之前触发，没有vue实例，返回的结果会挂载到vue实例上
+  * 有利于seo
+  * 可以获取context与plugins相同
+* meta
+  * head return的结果会挂载到对应的位置
+  * 如title,meta
+  * meta有个hid，防止子组件覆盖父组件
+* 中间价
+  * middleware与plugin相似，中间价的挂载到上下文
+  * 可以做路由拦截
+  * 注入方式组件参数middleware支持字符串/数组
+---
+
+
+
 #### DEMO地址   https://demo.realworld.io/#/
 
 **要求**
@@ -26,6 +79,8 @@
 [**练习二：手动部署项目到服务器**](https://gitee.com/lagoufed/fed-e-questions/tree/master/part3/%E7%AC%94%E8%AE%B02-%E6%89%8B%E5%8A%A8%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E7%BB%83%E4%B9%A0)
 
 [**练习三：自动化部署项目到服务器**](https://gitee.com/lagoufed/fed-e-questions/tree/master/part3/%E7%AC%94%E8%AE%B03-%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8)
+
+
 
 
 
