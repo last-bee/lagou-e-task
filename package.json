@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/last-bee/lagou-e-task#readme",
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "mime": "^3.0.0"
   }
 }
