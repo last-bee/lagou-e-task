@@ -51,14 +51,14 @@
 ```
 
 
-![avatar](/img/login.png)
+![avatar](./img/login.png)
 
 ###  根据名字查询用户
 * GET
 * /getUserByName/:name
 * 参数 none
 
-![avatar](/img/name.png)
+![avatar](./img/name.png)
 
 
 
