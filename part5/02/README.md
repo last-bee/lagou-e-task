@@ -12,4 +12,4 @@
    "type": "male",
    "content": "这是一个漂流瓶"
 }
-* result: ![](./2.png)
+* result: ![](./1.png)
